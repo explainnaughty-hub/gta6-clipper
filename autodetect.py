@@ -65,17 +65,24 @@ def main():
     os.makedirs("clips", exist_ok=True)
     os.makedirs("temp", exist_ok=True)
 
-    print("📥 Stream ka audio fetch ho raha hai (Bypassing Bot Check)...")
+    print("📥 Stream ka audio fetch ho raha hai...")
     raw_audio = "temp/raw_audio.wav"
     clean_audio = "temp/clean_audio.wav"
 
-    # Step 1: Audio download (Android Client se taake YouTube block na kare)
-    subprocess.run([
+    # Cookies check karna
+    cookie_args = []
+    if os.path.exists("cookies.txt") and os.path.getsize("cookies.txt") > 20:
+        print("🍪 Authenticated YouTube Cookies use ho rahi hain...")
+        cookie_args = ["--cookies", "cookies.txt"]
+
+    # Step 1: Audio download
+    cmd_audio = [
         "yt-dlp", "-x", "--audio-format", "wav",
-        "--extractor-args", "youtube:player_client=android,web",
         "--force-overwrites",
-        "-o", raw_audio, video_url
-    ], check=True)
+        "-o", raw_audio
+    ] + cookie_args + [video_url]
+    
+    subprocess.run(cmd_audio, check=True)
 
     # Step 2: Audio ko standard 16kHz Mono banana
     subprocess.run([
@@ -100,18 +107,18 @@ def main():
 
         print(f"\n✂️ Generating Clip {i+1} ({start}s - {end}s)...")
         
-        # Download targeted clip section with Android bypass
-        subprocess.run([
+        # Download targeted clip section
+        cmd_clip = [
             "yt-dlp",
             "--download-sections", f"*{start}-{end}",
-            "--extractor-args", "youtube:player_client=android,web",
             "--force-keyframes-at-cuts",
             "-f", "bv*+ba/b",
             "--merge-output-format", "mp4",
             "--force-overwrites",
-            "-o", raw_clip,
-            video_url
-        ], check=True)
+            "-o", raw_clip
+        ] + cookie_args + [video_url]
+
+        subprocess.run(cmd_clip, check=True)
 
         # Convert to 9:16 vertical with blurred background
         subprocess.run([
