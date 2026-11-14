@@ -1,0 +1,45 @@
+name: GTA 6 Auto Highlight Clipper
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'Stream ya Video ka URL (YouTube / Twitch / Kick)'
+        required: true
+        type: string
+      num_clips:
+        description: 'Kitni viral clips banani hain? (e.g. 3 ya 5)'
+        required: false
+        default: '3'
+        type: string
+
+jobs:
+  auto-clip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          pip install yt-dlp numpy
+
+      - name: Run Auto Highlight Detection
+        run: |
+          python autodetect.py "${{ inputs.video_url }}" "${{ inputs.num_clips }}"
+
+      - name: Upload Video Clips
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta6_viral_clips
+          path: clips/*.mp4
+          retention-days: 7
