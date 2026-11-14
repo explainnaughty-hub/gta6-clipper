@@ -26,12 +26,17 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Deno (Unlocks YouTube Video Formats)
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
       - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
-          pip install --upgrade yt-dlp numpy
+          pip install --upgrade "yt-dlp[default]" numpy
 
       - name: Create Cookies File from Secret
         run: |
