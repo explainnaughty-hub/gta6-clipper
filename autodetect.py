@@ -75,9 +75,11 @@ def main():
         print("🍪 Authenticated YouTube Cookies use ho rahi hain...")
         cookie_args = ["--cookies", "cookies.txt"]
 
-    # Step 1: Audio download
+    # Step 1: Audio download with explicit audio format
     cmd_audio = [
-        "yt-dlp", "-x", "--audio-format", "wav",
+        "yt-dlp",
+        "-f", "ba/b",
+        "-x", "--audio-format", "wav",
         "--force-overwrites",
         "-o", raw_audio
     ] + cookie_args + [video_url]
