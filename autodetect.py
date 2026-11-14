@@ -65,18 +65,19 @@ def main():
     os.makedirs("clips", exist_ok=True)
     os.makedirs("temp", exist_ok=True)
 
-    print("📥 Stream ka audio fetch ho raha hai...")
+    print("📥 Stream ka audio fetch ho raha hai (Bypassing Bot Check)...")
     raw_audio = "temp/raw_audio.wav"
     clean_audio = "temp/clean_audio.wav"
 
-    # Step 1: Audio download
+    # Step 1: Audio download (Android Client se taake YouTube block na kare)
     subprocess.run([
         "yt-dlp", "-x", "--audio-format", "wav",
+        "--extractor-args", "youtube:player_client=android,web",
         "--force-overwrites",
         "-o", raw_audio, video_url
     ], check=True)
 
-    # Step 2: Audio ko standard 16kHz Mono banana (Zero Error Guarantee)
+    # Step 2: Audio ko standard 16kHz Mono banana
     subprocess.run([
         "ffmpeg", "-y", "-i", raw_audio,
         "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le",
@@ -99,10 +100,11 @@ def main():
 
         print(f"\n✂️ Generating Clip {i+1} ({start}s - {end}s)...")
         
-        # Download targeted clip section
+        # Download targeted clip section with Android bypass
         subprocess.run([
             "yt-dlp",
             "--download-sections", f"*{start}-{end}",
+            "--extractor-args", "youtube:player_client=android,web",
             "--force-keyframes-at-cuts",
             "-f", "bv*+ba/b",
             "--merge-output-format", "mp4",
