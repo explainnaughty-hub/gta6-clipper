@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Deno (Bypasses YouTube Bot Check)
+      - name: Install Deno (Fixes YouTube JS Bot Challenge)
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
