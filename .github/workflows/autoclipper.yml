@@ -26,11 +26,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Deno (Fixes YouTube JS Bot Challenge)
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.x
-
       - name: Install System Dependencies
         run: |
           sudo apt-get update
@@ -38,9 +33,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade yt-dlp numpy
 
+      - name: Create Cookies File from Secret
+        run: |
+          echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
+
       - name: Run Auto Highlight Detection
         run: |
           python autodetect.py "${{ inputs.video_url }}" "${{ inputs.num_clips }}"
+
+      - name: Clean Cookies
+        if: always()
+        run: |
+          rm -f cookies.txt
 
       - name: Upload Video Clips
         uses: actions/upload-artifact@v4
